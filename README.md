@@ -9,6 +9,7 @@
 5. [Cómo ejecutar las pruebas con Maven](#5-cómo-ejecutar-las-pruebas-con-maven)
 6. [Cómo interpretar la cobertura de JaCoCo](#6-cómo-interpretar-la-cobertura-de-jacoco)
 7. [Ejercicios para practicar](#7-ejercicios-para-practicar)
+8. [Videos de YouTube para repasar](#8-videos-de-youtube-para-repasar)
 
 ## 1. Qué es una prueba unitaria y por qué importa
 
@@ -245,3 +246,15 @@ Si falta el HTML, confirma que ejecutaste `verify` y que la compilación llegó 
 4. **Lee el informe.** Busca una línea de una validación y explica qué entradas usaste para recorrer sus caminos. Luego responde qué pasaría si quitaras las aserciones y dejaras las llamadas al código. La ejecución podría seguir contando para la cobertura, pero la prueba perdería su comprobación.
 
 Antes de dar un test por listo, confirma que se puede ejecutar solo, que su nombre describe la regla y que fallaría si alguien introdujera el error que buscas detectar.
+
+## 8. Videos de YouTube para repasar
+
+Mira los videos en el orden de la tabla. Después de cada uno, vuelve al ejemplo o al comando de la guía y pruébalo con tus propios datos.
+
+| Tema | En qué fijarte | Video |
+|---|---|---|
+| **JUnit 5 y pruebas por capa** | Empieza por las aserciones y el patrón Arrange, Act, Assert. Luego compara cómo se prueba un servicio con Mockito, un controlador con MockMvc y un repositorio con H2. | [Testing Spring Boot Applications — Coder Army (2026)](https://www.youtube.com/watch?v=8MAjlB7g6uI) |
+| **Mockito en español** | Observa cómo se añade Mockito a un proyecto que ya usa JUnit 5. Aplica el ejemplo al taller identificando el servicio real, la dependencia simulada y la respuesta que quieres preparar. | [Pruebas unitarias con Mockito — El laboratorio de Rafa (2024)](https://www.youtube.com/watch?v=L7N5rm68iyA) |
+| **JaCoCo y Maven** | Distingue el informe de resultados de Surefire del informe de cobertura de JaCoCo. Después ejecuta `mvn clean verify` en el taller y abre `target/site/jacoco/index.html`. | [How to Generate Unit Test & Code Coverage Reports Using Maven — Rajesh Daily Tech (2025)](https://www.youtube.com/watch?v=2TDcYd7qeys) |
+
+El primer video muestra `@MockitoBean` en su ejemplo de Spring. Para repetir la práctica en este taller con Spring Boot 3.3, sigue el ejemplo con `@MockBean` de la sección de integración. El video de cobertura usa `mvn site`. El POM del taller genera el HTML en la fase `verify`.
