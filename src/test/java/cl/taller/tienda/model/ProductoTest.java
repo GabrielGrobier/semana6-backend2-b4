@@ -61,4 +61,28 @@ class ProductoTest {
         assertEquals(0, producto.getStock());
         assertFalse(producto.tieneStock());
     }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void rechazaNombreInvalido(String nombre) {
+        assertThrows(IllegalArgumentException.class, () -> new Producto(nombre, 15000, 10));
+    }
+
+    @Test
+    void rechazaPrecioNegativo() {
+        assertThrows(IllegalArgumentException.class, () -> new Producto("Teclado", -1, 10));
+    }
+
+    // Ejercicio de clase. Quita @Disabled y ejecuta el test antes de corregir el constructor.
+    @Disabled("El constructor todavía acepta precio cero")
+    @Test
+    void rechazaPrecioCero() {
+        assertThrows(IllegalArgumentException.class, () -> new Producto("Teclado", 0, 10));
+    }
+
+    @Test
+    void rechazaStockNegativo() {
+        assertThrows(IllegalArgumentException.class, () -> new Producto("Teclado", 15000, -1));
+    }
 }
