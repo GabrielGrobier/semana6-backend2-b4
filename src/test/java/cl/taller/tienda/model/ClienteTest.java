@@ -35,4 +35,25 @@ class ClienteTest {
     void idEsNuloAntesDeGuardar() {
         assertNull(cliente.getId());
     }
+
+    // Camino infeliz. JUnit ejecuta un caso por cada nombre del ejemplo.
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void rechazaNombreInvalido(String nombre) {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> new Cliente(nombre, "juan.perez@example.com"));
+
+        assertEquals("Nombre obligatorio", error.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = "juan.example.com")
+    void rechazaCorreoInvalido(String correo) {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> new Cliente("juan", correo));
+
+        assertEquals("Correo invalido", error.getMessage());
+    }
 }
