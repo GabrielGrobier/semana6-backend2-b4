@@ -33,6 +33,7 @@ class ClienteTest {
 
     @Test
     void idEsNuloAntesDeGuardar() {
+        // Acá solo creo el objeto. JPA asigna el ID cuando lo guardo.
         assertNull(cliente.getId());
     }
 
@@ -51,6 +52,7 @@ class ClienteTest {
     @NullAndEmptySource
     @ValueSource(strings = "juan.example.com")
     void rechazaCorreoInvalido(String correo) {
+        // Dejo el nombre válido para comprobar solo la regla del correo.
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> new Cliente("juan", correo));
 
