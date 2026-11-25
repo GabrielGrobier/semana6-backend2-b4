@@ -132,4 +132,38 @@ class TiendaServiceTest {
         assertEquals("Producto no encontrado", error.getMessage());
         verifyNoInteractions(pedidos);
     }
+
+    @Test
+    void confirmaYGuardaPedido() {
+        when(pedidos.findById(1L)).thenReturn(Optional.of(pedido));
+        when(pedidos.save(pedido)).thenReturn(pedido);
+
+        Pedido resultado = tiendaService.confirmarPedido(1L);
+
+        assertEquals(EstadoPedido.CONFIRMADO, resultado.getEstado());
+        assertEquals(7, producto.getStock());
+        verify(pedidos).save(pedido);
+    }
+
+    @Test
+    void cancelaYGuardaPedido() {
+        when(pedidos.findById(1L)).thenReturn(Optional.of(pedido));
+        when(pedidos.save(pedido)).thenReturn(pedido);
+
+        Pedido resultado = tiendaService.cancelarPedido(1L);
+
+        assertEquals(EstadoPedido.CANCELADO, resultado.getEstado());
+        verify(pedidos).save(pedido);
+    }
+
+    @Test
+    void noGuardaSiFallaLaConfirmacion() {
+        pedido.cancelar();
+        when(pedidos.findById(1L)).thenReturn(Optional.of(pedido));
+
+        assertThrows(IllegalStateException.class, () -> tiendaService.confirmarPedido(1L));
+
+        // Con never compruebo que el servicio no llegó a guardar el pedido.
+        verify(pedidos, never()).save(any(Pedido.class));
+    }
 }
