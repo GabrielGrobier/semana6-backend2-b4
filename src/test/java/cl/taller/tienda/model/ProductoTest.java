@@ -85,4 +85,35 @@ class ProductoTest {
     void rechazaStockNegativo() {
         assertThrows(IllegalArgumentException.class, () -> new Producto("Teclado", 15000, -1));
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void rechazaDescuentoConCantidadInvalida(int cantidad) {
+        assertThrows(IllegalArgumentException.class, () -> producto.descontarStock(cantidad));
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void rechazaDescuentoConStockInsuficiente() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> producto.descontarStock(11));
+
+        assertEquals("Stock insuficiente", error.getMessage());
+        assertEquals(10, producto.getStock());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void rechazaReposicionConCantidadInvalida(int cantidad) {
+        assertThrows(IllegalArgumentException.class, () -> producto.reponerStock(cantidad));
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void conservaElStockSiLaReposicionSuperaElMaximo() {
+        Producto conStockMaximo = new Producto("Teclado", 15000, Integer.MAX_VALUE);
+
+        assertThrows(ArithmeticException.class, () -> conStockMaximo.reponerStock(1));
+        assertEquals(Integer.MAX_VALUE, conStockMaximo.getStock());
+    }
 }
