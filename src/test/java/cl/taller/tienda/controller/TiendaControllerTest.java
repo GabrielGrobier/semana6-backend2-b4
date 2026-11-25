@@ -122,4 +122,36 @@ class TiendaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("CANCELADO"));
     }
+
+    // Camino infeliz. Simulo la excepción y reviso cómo la API la traduce a HTTP.
+    @Test
+    void devuelve400CuandoLaCantidadEsInvalida() throws Exception {
+        when(tiendaService.crearPedido(1L, 2L, 0))
+                .thenThrow(new IllegalArgumentException("Cantidad invalida"));
+
+        mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"clienteId":1,"productoId":2,"cantidad":0}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Cantidad invalida"));
+    }
+
+    @Test
+    void devuelve404CuandoElPedidoNoExiste() throws Exception {
+        when(tiendaService.buscarPedido(99L)).thenThrow(new NoSuchElementException("Pedido no encontrado"));
+
+        mvc.perform(get("/api/pedidos/{id}", 99L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Pedido no encontrado"));
+    }
+
+    @Test
+    void devuelve409CuandoElPedidoYaFueCancelado() throws Exception {
+        when(tiendaService.cancelarPedido(1L)).thenThrow(new IllegalStateException("Pedido ya cancelado"));
+
+        mvc.perform(patch("/api/pedidos/{id}/cancelar", 1L))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("Pedido ya cancelado"));
+    }
 }
