@@ -71,4 +71,55 @@ class TiendaControllerTest {
                 .andExpect(jsonPath("$.precio").value(15000))
                 .andExpect(jsonPath("$.stock").value(10));
     }
+
+    @Test
+    void listaPedidos() throws Exception {
+        when(tiendaService.listarPedidos()).thenReturn(List.of(pedido));
+
+        mvc.perform(get("/api/pedidos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].cantidad").value(3));
+    }
+
+    @Test
+    void buscaPedidoPorId() throws Exception {
+        when(tiendaService.buscarPedido(1L)).thenReturn(pedido);
+
+        mvc.perform(get("/api/pedidos/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("PENDIENTE"));
+    }
+
+    @Test
+    void creaPedidoYDevuelve201() throws Exception {
+        when(tiendaService.crearPedido(1L, 2L, 3)).thenReturn(pedido);
+
+        mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"clienteId":1,"productoId":2,"cantidad":3}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cantidad").value(3))
+                .andExpect(jsonPath("$.estado").value("PENDIENTE"));
+    }
+
+    @Test
+    void confirmaPedido() throws Exception {
+        pedido.confirmar();
+        when(tiendaService.confirmarPedido(1L)).thenReturn(pedido);
+
+        mvc.perform(patch("/api/pedidos/{id}/confirmar", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("CONFIRMADO"));
+    }
+
+    @Test
+    void cancelaPedido() throws Exception {
+        pedido.cancelar();
+        when(tiendaService.cancelarPedido(1L)).thenReturn(pedido);
+
+        mvc.perform(patch("/api/pedidos/{id}/cancelar", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("CANCELADO"));
+    }
 }
