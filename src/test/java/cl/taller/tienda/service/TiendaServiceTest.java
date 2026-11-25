@@ -70,4 +70,66 @@ class TiendaServiceTest {
 
         assertEquals(List.of(producto), tiendaService.listarProductos());
     }
+
+    @Test
+    void listaPedidos() {
+        when(pedidos.findAll()).thenReturn(List.of(pedido));
+
+        assertEquals(List.of(pedido), tiendaService.listarPedidos());
+    }
+
+    @Test
+    void encuentraPedidoPorId() {
+        when(pedidos.findById(1L)).thenReturn(Optional.of(pedido));
+
+        assertSame(pedido, tiendaService.buscarPedido(1L));
+    }
+
+    @Test
+    void informaQueElPedidoNoExiste() {
+        when(pedidos.findById(1L)).thenReturn(Optional.empty());
+
+        NoSuchElementException error = assertThrows(NoSuchElementException.class,
+                () -> tiendaService.buscarPedido(1L));
+
+        assertEquals("Pedido no encontrado", error.getMessage());
+    }
+
+    @Test
+    void creaPedidoConElClienteYElProductoEncontrados() {
+        when(clientes.findById(1L)).thenReturn(Optional.of(cliente));
+        when(productos.findById(2L)).thenReturn(Optional.of(producto));
+        when(pedidos.save(any(Pedido.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
+
+        Pedido resultado = tiendaService.crearPedido(1L, 2L, 3);
+
+        assertSame(cliente, resultado.getCliente());
+        assertSame(producto, resultado.getProducto());
+        assertEquals(3, resultado.getCantidad());
+        assertEquals(EstadoPedido.PENDIENTE, resultado.getEstado());
+        verify(pedidos).save(resultado);
+    }
+
+    @Test
+    void noGuardaPedidoSiFaltaElCliente() {
+        when(clientes.findById(1L)).thenReturn(Optional.empty());
+
+        NoSuchElementException error = assertThrows(NoSuchElementException.class,
+                () -> tiendaService.crearPedido(1L, 2L, 3));
+
+        assertEquals("Cliente no encontrado", error.getMessage());
+        verifyNoInteractions(pedidos);
+    }
+
+    @Test
+    void noGuardaPedidoSiFaltaElProducto() {
+        when(clientes.findById(1L)).thenReturn(Optional.of(cliente));
+        when(productos.findById(2L)).thenReturn(Optional.empty());
+
+        NoSuchElementException error = assertThrows(NoSuchElementException.class,
+                () -> tiendaService.crearPedido(1L, 2L, 3));
+
+        assertEquals("Producto no encontrado", error.getMessage());
+        verifyNoInteractions(pedidos);
+    }
 }
