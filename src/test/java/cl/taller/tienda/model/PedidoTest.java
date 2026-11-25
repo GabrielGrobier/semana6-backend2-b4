@@ -64,4 +64,41 @@ class PedidoTest {
         assertEquals(EstadoPedido.CONFIRMADO, pedido.getEstado());
         assertEquals(7, producto.getStock());
     }
+
+    @Test
+    void cancelaPendienteSinCambiarElStock() {
+        pedido.cancelar();
+
+        assertEquals(EstadoPedido.CANCELADO, pedido.getEstado());
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void devuelveElStockAlCancelarUnPedidoConfirmado() {
+        pedido.confirmar();
+
+        pedido.cancelar();
+
+        assertEquals(EstadoPedido.CANCELADO, pedido.getEstado());
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void rechazaCancelarUnPedidoYaCancelado() {
+        pedido.confirmar();
+        pedido.cancelar();
+
+        // También reviso el stock para detectar una devolución por segunda vez.
+        assertThrows(IllegalStateException.class, pedido::cancelar);
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void rechazaConfirmarUnPedidoCancelado() {
+        pedido.cancelar();
+
+        assertThrows(IllegalStateException.class, pedido::confirmar);
+        assertEquals(EstadoPedido.CANCELADO, pedido.getEstado());
+        assertEquals(10, producto.getStock());
+    }
 }
