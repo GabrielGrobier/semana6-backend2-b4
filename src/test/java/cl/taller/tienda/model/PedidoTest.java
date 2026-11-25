@@ -38,4 +38,30 @@ class PedidoTest {
     void rechazaCantidadInvalida(int cantidad) {
         assertThrows(IllegalArgumentException.class, () -> new Pedido(cliente, producto, cantidad));
     }
+
+    @Test
+    void confirmaYDescuentaStock() {
+        pedido.confirmar();
+
+        assertEquals(EstadoPedido.CONFIRMADO, pedido.getEstado());
+        assertEquals(7, producto.getStock());
+    }
+
+    @Test
+    void siguePendienteCuandoNoHayStockSuficiente() {
+        Pedido pedidoGrande = new Pedido(cliente, producto, 11);
+
+        assertThrows(IllegalArgumentException.class, pedidoGrande::confirmar);
+        assertEquals(EstadoPedido.PENDIENTE, pedidoGrande.getEstado());
+        assertEquals(10, producto.getStock());
+    }
+
+    @Test
+    void rechazaUnaSegundaConfirmacion() {
+        pedido.confirmar();
+
+        assertThrows(IllegalStateException.class, pedido::confirmar);
+        assertEquals(EstadoPedido.CONFIRMADO, pedido.getEstado());
+        assertEquals(7, producto.getStock());
+    }
 }
