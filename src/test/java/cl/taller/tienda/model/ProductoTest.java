@@ -1,68 +1,64 @@
 package cl.taller.tienda.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-public class ProductoTest {
+class ProductoTest {
     private Producto producto;
 
-    @BeforeEach 
+    @BeforeEach
     void setUp() {
         producto = new Producto("Teclado", 15000, 10);
-        // Configuración inicial para cada test
     }
 
     @Test
     void testCalcularValorInventario() {
-
+        assertEquals(150000L, producto.calcularValorInventario());
     }
 
     @Test
     void testDescontarStock() {
+        // Arrange
+        int cantidad = 3;
 
-        int cantidad  = 3;
-        int esperado = 7;
+        // Act
         producto.descontarStock(cantidad);
 
-        int obtenido = producto.getStock();
-        assertEquals(esperado, obtenido);
-        
-
+        // Assert
+        assertEquals(7, producto.getStock());
     }
 
     @Test
-    void testGetId() {
-
-    }
-
-    @Test
-    void testGetNombre() {
-
-    }
-
-    @Test
-    void testGetPrecio() {
-
-    }
-
-    @Test
-    void testGetStock() {
-
+    void conservaLosDatosDelConstructor() {
+        assertNull(producto.getId());
+        assertEquals("Teclado", producto.getNombre());
+        assertEquals(15000, producto.getPrecio());
+        assertEquals(10, producto.getStock());
     }
 
     @Test
     void testReponerStock() {
+        producto.reponerStock(5);
 
+        assertEquals(15, producto.getStock());
     }
 
     @Test
     void testTieneStock() {
-        //act 
-        boolean tieneStock = producto.tieneStock();
-        //assert 
-        assertEquals(true, tieneStock);
+        assertTrue(producto.tieneStock());
+    }
+
+    @Test
+    void quedaSinStockAlDescontarTodasLasUnidades() {
+        producto.descontarStock(10);
+
+        assertEquals(0, producto.getStock());
+        assertFalse(producto.tieneStock());
     }
 }
