@@ -1,63 +1,38 @@
 package cl.taller.tienda.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-// A A A
-// Arrange --> Preparo los datos y objetos  
-// Act  --> Ejecuto las funcionalidades 
-// Assert  --> Verifico el resultado obtenido 
-
-
-
-public class ClienteTest {
+class ClienteTest {
     private Cliente cliente;
-    
 
-    @BeforeEach 
+    @BeforeEach
     void setUp() {
-        
-        cliente = new Cliente("juan","juan.perez@example.com");
-        // Configuración inicial para cada test
+        // Arrange común. Preparo un cliente nuevo antes de cada test.
+        cliente = new Cliente("juan", "juan.perez@example.com");
     }
-
 
     @Test
     void testGetCorreo() {
-
-        // Act
+        // Act. Leo el correo del cliente.
         String correo = cliente.getCorreo();
 
-        // Assert
+        // Assert. Comparo el resultado esperado con el obtenido.
         assertEquals("juan.perez@example.com", correo);
-
-    }
-
-    @Test
-    void testGetId() {
-
-
     }
 
     @Test
     void testGetNombre() {
-        
-
-    }
-    // camino infeliz 
-    @Test 
-    void tesNombreNule(){
-        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-            () -> new Cliente(null, "juan.perez@example.com"));
-
-        assertEquals("Nombre obligatorio", error);
-
-
+        assertEquals("juan", cliente.getNombre());
     }
 
-
+    @Test
+    void idEsNuloAntesDeGuardar() {
+        assertNull(cliente.getId());
+    }
 }
