@@ -101,7 +101,20 @@ Ejemplos para leer en el código. [ClienteTest](src/test/java/cl/taller/tienda/m
 
 ## 3. Cómo usar mocks con Mockito
 
-Un **doble de prueba** reemplaza a un colaborador durante el test. Un **mock** de Mockito puede devolver respuestas preparadas y registrar llamadas. Esto permite probar un servicio que consulta repositorios sin abrir una conexión a la base de datos.
+### Qué es un mock
+
+Un **mock** es un objeto que pongo en el lugar de una dependencia durante una prueba. Tiene el mismo tipo que espera mi código, así que puedo pasarlo al constructor como si fuera el colaborador habitual. Mockito controla qué responde ese objeto y guarda un registro de las llamadas que recibe.
+
+En el ejemplo de abajo, `TiendaService` es el objeto real que quiero probar y `ProductoRepository` es una de sus dependencias. Si le paso un mock del repositorio, el servicio ejecuta toda su lógica y, cuando pide un producto, Mockito responde sin consultar la base de datos.
+
+### Cómo funciona durante el test
+
+1. **Creo el reemplazo.** Con `mock(ProductoRepository.class)` obtengo un objeto que puedo pasar al constructor de `TiendaService`.
+2. **Preparo una respuesta.** Con `when(productos.findById(2L)).thenReturn(Optional.empty())` indico que la búsqueda del ID `2` debe devolver un resultado vacío. Mockito guarda esa configuración para las llamadas que coincidan.
+3. **Ejecuto el código real.** Al llamar a `servicio.crearPedido(1L, 2L, 3)`, el servicio consulta al repositorio simulado. Mockito registra la llamada y devuelve el `Optional.empty()` que preparé. El servicio recibe ese resultado y decide lanzar la excepción.
+4. **Compruebo lo ocurrido.** Con JUnit reviso la excepción. Con `verify` puedo preguntar si hubo una llamada específica. Por ejemplo, `verify(productos).findById(2L)` comprueba que el servicio buscó exactamente ese ID.
+
+Una llamada sin respuesta configurada recibe el valor que Mockito usa por defecto para ese tipo, como `false`, `0`, un `Optional.empty()` o `null`, según lo que devuelva el método. Cuando una respuesta es importante para entender el caso, conviene escribirla explícitamente en el test.
 
 - **Configurar una respuesta** (*stubbing*). Con `when(...).thenReturn(...)` indico qué devuelve el colaborador para una llamada. Con `thenThrow(...)` simulo un error.
 - **Verificar una interacción.** Con `verify(...)` compruebo que el servicio pidió una operación concreta. Esto sirve cuando la llamada es un efecto importante, como guardar un pedido.
